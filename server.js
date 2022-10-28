@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const colors = require('colors');
+const listEndpoints = require('express-list-endpoints');
 
 //Dependencia a la conexion a bd
 const connectDB = require('./config/db')
@@ -16,12 +17,15 @@ dotenv.config({
 
 //1 Crear el objetos de app
 const app = express()
+app.use(express.json())
 
 //Ejecutar la conexión a bd 
 connectDB()
 
 app.use('/api/v1/bootcamps' , bootcampRoutes)
 app.use('/api/v1/users' , userRoutes)
+
+console.log(listEndpoints(app))
 
 //3 Ejecutar servidor de desarrollo de express 
 app.listen(process.env.PORT , ()=>{
