@@ -1,62 +1,127 @@
 //Objeto de conexión 
 const sequelize = require('../config/seq')
 //DataTypes
-const {DataTypes} = require('sequelize')
+const {DataTypes, ValidationError} = require('sequelize')
 //El modelo
 const UserModel =require('../models/user')
 //Crear el objeto usuario
 const User = UserModel(sequelize, DataTypes)
 
 exports.traerUsers = async (req, res)=>{
-    const users = await User.findAll();
-    res.status(200).json(
-        {
-          "success": true,
-          "data" : users
-        }
-    )
+    try {
+        const users = await User.findAll();
+        res.status(200).json(
+            {
+              "success": true,
+              "data" : users
+            }
+        )
+    } catch (error) {
+        res.status(500).json({
+            "success": false,
+            "errors": "Error de servidor"
+        })
+    }
+   
 }
 
 exports.traerUsersporId = async (req,res)=>{
-    const userId = await User.findByPk(req.params.id)
-    res.status(200).json(
-        {
-            "success": true,
-            "data" : userId
+    try {
+        const userId = await User.findByPk(req.params.id)
+        //Si usuario no existe
+        if(!userId){
+            res.status(422).json(
+                {
+                    "success": true,
+                    "data" : userId
+                }
+            )
+        }else{
+            res.status(422).json(
+                {
+                    "success": true,
+                    "data" : userId
+                }
+            )
         }
-    ) 
+    } catch (error) {
+        res.status(200).json({
+            "success": false,
+            "errors": "Error de servidor"
+        })
+    }
+
 }
 
 exports.crearUser = async (req, res)=>{
-    const newUser = await User.create(req.body);
-    res.status(201).json(
+    try {
+        const newUser = await User.create(req.body);
+        res.status(201).json(
         {
             "success": true,
             "data": newUser
         }
     )
-}
-
-exports.actualizarUser = async (req, res)=>{
-    //Actualizar usuario por id
-    await User.update(req.body, 
-        {
-            where: {
-                id: req.params.id
-            }
-        }
-    )
-    //Consultar datos actualizados
-    const upUser = await User.findByPk(req.params.id)
-
-    res.status(200).json(
-        {
+    } catch (error) {
+        if(error instanceof ValidationError){
+            const errores = error.errors.map((e)=>
+            e.message
+        )
+        res.status(422).json({
             "success": true,
-            "data" : upUser
-        }
-    )
+            "errors": errores
+        })
+        }else{
+        //Error de servidor
+        res.status(500).json({
+            "success": true,
+            "errors": "error de servidor"
+        })
+    }
+    }
 }
 
+//PUT - PATCH: actualizar
+exports.actualizarUser = async(req , res)=>{
+    try {
+        //consultar datos actualizados
+      const upUser = await User.findByPk(req.params.id)
+      if(!upUser){
+        //response de usuario no encontrado
+        res.status(422).json(
+            {
+                "success": false,
+                "errors": [
+                    "usuario no existe"
+                ]  
+            }
+           )   
+       }else{
+            //actualizar usuario por id
+            await User.update(req.body, {
+                where: {
+                id: req.params.id
+                }
+            });
+            //seleccionar usuario actualizado
+              //consultar datos actualizados
+            const userAct = await User.findByPk(req.params.id)
+            //enviar response con usuario actualizado
+            res.status(200).json({
+                "success" : true,
+                "data" :  userAct
+            })
+       }
+    } catch (error) {
+        res
+        .status(500)
+        .json({
+             "success": false, 
+             "errors":  "error de servidor"  
+        })
+    }
+ }
+ 
 exports.eliminarUser = async (req, res)=>{
     //Buscar al usuario por id
     const u = await User.findByPk(req.params.id)

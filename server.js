@@ -22,6 +22,7 @@ app.use(express.json())
 //Ejecutar la conexión a bd 
 connectDB()
 
+app.use(express.json())
 app.use('/api/v1/bootcamps' , bootcampRoutes)
 app.use('/api/v1/users' , userRoutes)
 
