@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         notNull: {
           args: true,
           msg: 'Name debe ser existente '
-        }  
+        },
       }
     },
     email: {

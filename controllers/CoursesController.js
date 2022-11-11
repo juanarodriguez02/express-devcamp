@@ -3,63 +3,18 @@ const sequelize = require('../config/seq')
 //DataTypes
 const {DataTypes, ValidationError} = require('sequelize')
 //El modelo
-const UserModel =require('../models/user')
+const CoursesModel =require('../models/courses')
 //Crear el objeto usuario
-const User = UserModel(sequelize, DataTypes)
+const Courses = CoursesModel(sequelize, DataTypes)
 
-exports.traerUsers = async (req, res)=>{
+//Crear Courses
+exports.crearCourses = async (req, res)=>{
     try {
-        const users = await User.findAll();
-        res.status(200).json(
-            {
-              "success": true,
-              "data" : users
-            }
-        )
-    } catch (error) {
-        res.status(500).json({
-            "success": false,
-            "errors": "Error de servidor"
-        })
-    }
-   
-}
-
-exports.traerUsersporId = async (req,res)=>{
-    try {
-        const userId = await User.findByPk(req.params.id)
-        //Si usuario no existe
-        if(!userId){
-            res.status(422).json(
-                {
-                    "success": true,
-                    "data" : userId
-                }
-            )
-        }else{
-            res.status(422).json(
-                {
-                    "success": true,
-                    "data" : userId
-                }
-            )
-        }
-    } catch (error) {
-        res.status(200).json({
-            "success": false,
-            "errors": "Error de servidor"
-        })
-    }
-
-}
-
-exports.crearUser = async (req, res)=>{
-    try {
-        const newUser = await User.create(req.body);
+        const newCourses = await Courses.create(req.body);
         res.status(201).json(
         {
             "success": true,
-            "data": newUser
+            "data": newCourses
         }
     )
     } catch (error) {
@@ -81,13 +36,57 @@ exports.crearUser = async (req, res)=>{
     }
 }
 
-//PUT - PATCH:
+exports.traerCourses = async (req, res)=>{
+    try {
+        const courses = await Courses.findAll();
+        res.status(200).json(
+            {
+              "success": true,
+              "data" : courses
+            }
+        )
+    } catch (error) {
+        res.status(500).json({
+            "success": false,
+            "errors": "Error de servidor"
+        })
+    }
+   
+}
 
-exports.actualizarUser = async(req , res)=>{
+exports.traerCoursesporId = async (req,res)=>{
+    try {
+        const coursesId = await Courses.findByPk(req.params.id)
+        //Si usuario no existe
+        if(!coursesId){
+            res.status(422).json(
+                {
+                    "success": true,
+                    "data" : coursesId
+                }
+            )
+        }else{
+            res.status(422).json(
+                {
+                    "success": true,
+                    "data" : coursesId
+                }
+            )
+        }
+    } catch (error) {
+        res.status(200).json({
+            "success": false,
+            "errors": "Error de servidor"
+        })
+    }
+}
+
+//PUT - PATCH:
+exports.actualizarCourses = async(req , res)=>{
     try {
         //consultar datos actualizados
-      const upUser = await User.findByPk(req.params.id)
-      if(!upUser){
+      const upCourses = await Courses.findByPk(req.params.id)
+      if(!upCourses){
         //response de usuario no encontrado
         res.status(422).json(
             {
@@ -99,18 +98,18 @@ exports.actualizarUser = async(req , res)=>{
            )   
        }else{
             //actualizar usuario por id
-            await User.update(req.body, {
+            await Courses.update(req.body, {
                 where: {
                 id: req.params.id
                 }
             });
             //seleccionar usuario actualizado
               //consultar datos actualizados
-            const userAct = await User.findByPk(req.params.id)
+            const coursesAct = await Courses.findByPk(req.params.id)
             //enviar response con usuario actualizado
             res.status(200).json({
                 "success" : true,
-                "data" :  userAct
+                "data" :  coursesAct
             })
        }
     } catch (error) {
@@ -122,14 +121,14 @@ exports.actualizarUser = async(req , res)=>{
         })
     }
 }
- 
+
 //DELETE: borrar un Usuario
-exports.eliminarUser = async (req , res)=>{
+exports.eliminarCourses = async (req , res)=>{
     //buscar el usuario por id
     try {
-        const u = await User.findByPk(req.params.id)
+        const u = await Courses.findByPk(req.params.id)
         // Borrar usuario 
-            await User.destroy({
+            await Courses.destroy({
                 where: {
                 id: req.params.id
                 }
@@ -147,6 +146,5 @@ exports.eliminarUser = async (req , res)=>{
                  "success": false, 
                  "errors":  "error de servidor"  
             })
-    }
-        
-    }
+    }   
+}
